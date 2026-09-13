@@ -321,6 +321,7 @@ button {
 .actions {
     display: flex;
     gap: 9px;
+    flex-wrap: wrap;
 }
 
 .btn {
@@ -905,6 +906,91 @@ body.dark .storage-fill {
     animation: toastIn .22s ease;
 }
 
+.note-modal {
+    width: min(900px, 100%);
+}
+
+.note-editor {
+    width: 100%;
+    min-height: 430px;
+    resize: vertical;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    outline: none;
+    background: var(--surface-soft);
+    color: var(--text);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.65;
+}
+
+.note-editor:focus {
+    background: var(--surface);
+    border-color: #c9cdd5;
+    box-shadow: 0 0 0 4px rgba(17, 19, 24, .04);
+}
+
+.link-url {
+    color: var(--text-soft);
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 3px;
+}
+
+.subfolder-section {
+    margin-bottom: 30px;
+}
+
+.subfolder-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.subfolder-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    padding: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    transition: .18s ease;
+}
+
+.subfolder-card:hover {
+    background: var(--surface-soft);
+    transform: translateY(-1px);
+}
+
+.subfolder-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: var(--surface-soft);
+    display: grid;
+    place-items: center;
+    flex: 0 0 38px;
+}
+
+@media (max-width: 700px) {
+    .subfolder-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .note-modal {
+        width: 100%;
+    }
+
+    .note-editor {
+        min-height: 320px;
+    }
+}
+
 @keyframes toastIn {
     from {
         opacity: 0;
@@ -1332,8 +1418,9 @@ function updateUser() {
 
 function renderFolderNav() {
     const nav = document.getElementById("folderNav");
+    const folders = state.folders.filter(folder => String(folder.parent_id || "ROOT") === "ROOT");
 
-    if (!state.folders.length) {
+    if (!folders.length) {
         nav.innerHTML = `
             <div style="
                 padding:8px 10px;
@@ -1346,7 +1433,7 @@ function renderFolderNav() {
         return;
     }
 
-    nav.innerHTML = state.folders.map(folder => `
+    nav.innerHTML = folders.map(folder => `
         <button
             class="nav-item"
             data-folder="${escapeAttribute(folder.id)}"
@@ -1437,6 +1524,7 @@ function renderContent() {
 
 function renderHome() {
     const folders = state.folders.filter(folder =>
+        String(folder.parent_id || "ROOT") === "ROOT" &&
         matchesSearch(folder.name)
     );
 
@@ -1463,6 +1551,14 @@ function renderHome() {
 
                 <button class="btn btn-primary" onclick="openFolderModal()">
                     + New Folder
+                </button>
+
+                <button class="btn btn-secondary" onclick="openLinkModal()">
+                    ↗ Add Link
+                </button>
+
+                <button class="btn btn-secondary" onclick="openNoteModal()">
+                    ≡ New Note
                 </button>
             </div>
         </div>
@@ -1508,27 +1604,29 @@ function renderFolderPage() {
     if (!folder) {
         document.getElementById("content").innerHTML =
             emptyState("Folder not found.", "The folder may have been removed.");
-
         return;
     }
+
+    const childFolders = state.folders.filter(item =>
+        String(item.parent_id || "") === String(folder.id) &&
+        matchesSearch(item.name)
+    );
 
     const files = state.files.filter(file =>
         file.folder_id === folder.id &&
         (
             matchesSearch(file.name) ||
-            matchesSearch(file.note)
+            matchesSearch(file.note) ||
+            matchesSearch(file.url)
         )
     );
 
     document.getElementById("content").innerHTML = `
         <div class="page-head">
             <div>
-                <h1 class="page-title">
-                    ${escapeHTML(folder.name)}
-                </h1>
-
+                <h1 class="page-title">${escapeHTML(folder.name)}</h1>
                 <p class="page-description">
-                    ${files.length} file${files.length === 1 ? "" : "s"}
+                    ${childFolders.length} folder${childFolders.length === 1 ? "" : "s"} · ${files.length} item${files.length === 1 ? "" : "s"}
                 </p>
             </div>
 
@@ -1536,11 +1634,44 @@ function renderFolderPage() {
                 <button class="btn btn-secondary" onclick="openUploadModal()">
                     ↑ Upload
                 </button>
+                <button class="btn btn-primary" onclick="openFolderModal()">
+                    + New Folder
+                </button>
+                <button class="btn btn-secondary" onclick="openLinkModal()">
+                    ↗ Add Link
+                </button>
+                <button class="btn btn-secondary" onclick="openNoteModal()">
+                    ≡ New Note
+                </button>
             </div>
         </div>
 
+        ${childFolders.length ? `
+            <section class="subfolder-section">
+                <div class="section-head">
+                    <h2 class="section-title">Folders</h2>
+                </div>
+                <div class="subfolder-grid">
+                    ${childFolders.map(subfolderCard).join("")}
+                </div>
+            </section>
+        ` : ""}
+
         <div class="file-panel">
             ${fileList(files)}
+        </div>
+    `;
+}
+
+function subfolderCard(folder) {
+    const count = state.files.filter(file => file.folder_id === folder.id).length;
+    return `
+        <div class="subfolder-card" onclick="openFolder('${escapeAttribute(folder.id)}')">
+            <div class="subfolder-icon">📁</div>
+            <div style="min-width:0">
+                <div class="folder-name">${escapeHTML(folder.name)}</div>
+                <div class="folder-meta">${count} item${count === 1 ? "" : "s"}</div>
+            </div>
         </div>
     `;
 }
@@ -1711,7 +1842,7 @@ function fileList(files, isTrash = false) {
         ${files.map(file => `
             <div
                 class="file-row"
-                ondblclick="previewFile('${escapeAttribute(file.id)}', ${isTrash})"
+                onclick="openFileItem(event, '${escapeAttribute(file.id)}', ${isTrash})"
                 oncontextmenu="openFileContext(event, '${escapeAttribute(file.id)}', ${isTrash})"
             >
                 <div class="file-info">
@@ -1723,12 +1854,14 @@ function fileList(files, isTrash = false) {
                     <div style="min-width:0">
 
                         <div class="file-name">
-                            ${escapeHTML(file.name)}
+                            ${file.type === "LINK" && file.url
+                                ? `<span style="cursor:pointer">${escapeHTML(file.name)}</span>`
+                                : escapeHTML(file.name)}
                         </div>
 
-                        <div class="file-note">
-                            ${escapeHTML(file.note || "No note")}
-                        </div>
+                        ${file.type === "LINK" && file.url
+                            ? `<div class="link-url">${escapeHTML(file.url)}</div>`
+                            : `<div class="file-note">${escapeHTML(file.note || "No note")}</div>`}
 
                     </div>
 
@@ -1859,7 +1992,7 @@ async function createFolder() {
 
         const response = await apiPost("createFolder", {
             name,
-            parent_id: "1qiQodooK5aNdDfzBASq2eFQVaCshtPlz"
+            parent_id: state.currentFolder !== "ROOT" ? state.currentFolder : "1qiQodooK5aNdDfzBASq2eFQVaCshtPlz"
         });
 
         toast("Folder created.");
@@ -2149,7 +2282,8 @@ async function saveRename() {
         toast("Renaming...");
 
         const response = await apiPost("renameFile", {
-            drive_id: file.drive_id,
+            id: file.id,
+            drive_id: file.drive_id || "",
             name
         });
 
@@ -2164,44 +2298,73 @@ async function saveRename() {
 
 function editSelectedNote() {
     const file = getSelectedFile();
-
     if (!file) return;
-
     hideContextMenu();
+    openNoteEditor(file);
+}
 
+function openNoteEditor(file) {
     showModal(`
         <div class="modal-head">
-            <div class="modal-title">Edit note</div>
+            <div>
+                <div class="modal-title">${escapeHTML(file.name)}</div>
+                <div style="margin-top:4px;color:var(--muted);font-size:11px;">Plain text note</div>
+            </div>
             <button class="modal-close" onclick="closeModal()">×</button>
         </div>
 
         <div class="modal-body">
-
-            <label class="form-label">
-                Note
-            </label>
-
-            <input
-                id="noteInput"
-                class="form-input"
-                value="${escapeAttribute(file.note || "")}"
-                placeholder="Add a note..."
-            >
-
+            <textarea id="noteInput" class="note-editor" placeholder="Write your note here..."></textarea>
             <div class="modal-actions">
-
-                <button class="btn btn-secondary" onclick="closeModal()">
-                    Cancel
-                </button>
-
-                <button class="btn btn-primary" onclick="saveNote()">
-                    Save
-                </button>
-
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveNote()">Save note</button>
             </div>
-
         </div>
     `);
+    const input = document.getElementById("noteInput");
+    if (input) {
+        input.value = file.note || "";
+        setTimeout(() => input.focus(), 80);
+    }
+}
+
+function openNoteModal() {
+    const parentId = state.currentFolder !== "ROOT" ? state.currentFolder : "1qiQodooK5aNdDfzBASq2eFQVaCshtPlz";
+    showModal(`
+        <div class="modal-head">
+            <div class="modal-title">New note</div>
+            <button class="modal-close" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <label class="form-label">File name</label>
+            <input id="newNoteName" class="form-input" value="Note.txt" placeholder="Note.txt">
+            <label class="form-label" style="margin-top:15px;">Note</label>
+            <textarea id="newNoteContent" class="note-editor" style="min-height:320px" placeholder="Write your note here..."></textarea>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="createNote()">Create note</button>
+            </div>
+        </div>
+    `);
+    setTimeout(() => document.getElementById("newNoteName")?.focus(), 80);
+}
+
+async function createNote() {
+    const nameInput = document.getElementById("newNoteName");
+    const contentInput = document.getElementById("newNoteContent");
+    let name = nameInput?.value.trim() || "Note.txt";
+    if (!name.toLowerCase().endsWith(".txt")) name += ".txt";
+    const content = contentInput?.value || "";
+    const folderId = state.currentFolder !== "ROOT" ? state.currentFolder : "1qiQodooK5aNdDfzBASq2eFQVaCshtPlz";
+    try {
+        toast("Creating note...");
+        await apiPost("createNote", {name, content, folder_id: folderId});
+        closeModal();
+        toast("Note created.");
+        await loadData();
+    } catch (error) {
+        toast(error.message);
+    }
 }
 
 async function saveNote() {
@@ -2215,7 +2378,8 @@ async function saveNote() {
         toast("Saving note...");
 
         const response = await apiPost("updateNote", {
-            drive_id: file.drive_id,
+            id: file.id,
+            drive_id: file.drive_id || "",
             note: input.value.trim()
         });
 
@@ -2228,6 +2392,63 @@ async function saveNote() {
     }
 }
 
+function openLinkModal() {
+    const folderId = state.currentFolder !== "ROOT" ? state.currentFolder : "1qiQodooK5aNdDfzBASq2eFQVaCshtPlz";
+    showModal(`
+        <div class="modal-head">
+            <div class="modal-title">Add link</div>
+            <button class="modal-close" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <label class="form-label">Name</label>
+            <input id="linkName" class="form-input" placeholder="Example: Google Drive">
+            <label class="form-label" style="margin-top:15px;">URL</label>
+            <input id="linkUrl" class="form-input" type="url" placeholder="https://...">
+            <label class="form-label" style="margin-top:15px;">Note (optional)</label>
+            <input id="linkNote" class="form-input" placeholder="Add a short note...">
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="createLink()">Save link</button>
+            </div>
+        </div>
+    `);
+    setTimeout(() => document.getElementById("linkName")?.focus(), 80);
+}
+
+async function createLink() {
+    const name = document.getElementById("linkName")?.value.trim();
+    const url = document.getElementById("linkUrl")?.value.trim();
+    const note = document.getElementById("linkNote")?.value.trim() || "";
+    const folderId = state.currentFolder !== "ROOT" ? state.currentFolder : "1qiQodooK5aNdDfzBASq2eFQVaCshtPlz";
+    if (!name) { toast("Please enter a name."); return; }
+    if (!/^https?:\/\//i.test(url || "")) { toast("Please enter a valid http:// or https:// link."); return; }
+    try {
+        toast("Saving link...");
+        await apiPost("createLink", {name, url, note, folder_id: folderId});
+        closeModal();
+        toast("Link saved.");
+        await loadData();
+    } catch (error) {
+        toast(error.message);
+    }
+}
+
+function openFileItem(event, id, isTrash = false) {
+    if (event.target.closest(".more-btn")) return;
+    const source = isTrash ? state.trash : state.files;
+    const file = source.find(item => String(item.id) === String(id));
+    if (!file) return;
+    if (file.type === "LINK" && file.url) {
+        window.open(file.url, "_blank", "noopener,noreferrer");
+        return;
+    }
+    if (file.type === "TXT") {
+        openNoteEditor(file);
+        return;
+    }
+    previewFile(id, isTrash);
+}
+
 async function toggleSelectedFavorite() {
     const file = getSelectedFile();
 
@@ -2237,7 +2458,8 @@ async function toggleSelectedFavorite() {
 
     try {
         const response = await apiPost("toggleFavorite", {
-            drive_id: file.drive_id
+            id: file.id,
+            drive_id: file.drive_id || ""
         });
 
         toast("Favorite updated.");
@@ -2255,6 +2477,11 @@ function previewSelected() {
     if (!file) return;
 
     hideContextMenu();
+
+    if (file.type === "LINK" && file.url) {
+        window.open(file.url, "_blank", "noopener,noreferrer");
+        return;
+    }
 
     previewFile(
         file.id,
@@ -2365,12 +2592,9 @@ function previewFile(id, isTrash = false) {
 
             <div class="modal-actions">
 
-                <button
-                    class="btn btn-secondary"
-                    onclick="openDriveFile('${escapeAttribute(file.drive_id)}')"
-                >
-                    Open file
-                </button>
+                ${file.type === "LINK" && file.url
+                    ? `<button class="btn btn-primary" onclick="window.open('${escapeAttribute(file.url)}','_blank','noopener,noreferrer')">Open link</button>`
+                    : `<button class="btn btn-secondary" onclick="openDriveFile('${escapeAttribute(file.drive_id || "")}')">Open file</button>`}
 
             </div>
 
@@ -2444,7 +2668,8 @@ async function confirmTrash() {
         toast("Moving to trash...");
 
         const response = await apiPost("moveToTrash", {
-            drive_id: file.drive_id
+            id: file.id,
+            drive_id: file.drive_id || ""
         });
 
         toast("File moved to trash.");
@@ -2467,7 +2692,8 @@ async function restoreItem(id) {
         toast("Restoring...");
 
         const response = await apiPost("restoreFile", {
-            drive_id: file.drive_id
+            id: file.id,
+            drive_id: file.drive_id || ""
         });
 
         toast("File restored.");
