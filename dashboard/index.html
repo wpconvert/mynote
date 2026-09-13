@@ -1219,6 +1219,10 @@ body.dark .storage-fill {
         ☆ Favorite
     </button>
 
+    <button class="context-item" onclick="moveSelected()">
+        ↗ Move to folder
+    </button>
+
     <button class="context-item" onclick="previewSelected()">
         ◉ Preview
     </button>
@@ -1236,7 +1240,7 @@ body.dark .storage-fill {
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbzCvVGETzB4_AUY24nSiglJZiMcXnxY1C6vuedWkuBaJRtm0T29tQW2C5Xy7UpjUlQ/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbw7o2WHMa86ssnpK_DzJk3NHZSJSMIL5Zf5xDUKV_lMKwWtoa_Tbst1wqmt8Sf5nB1d/exec";
 
 const state = {
     user: sessionStorage.getItem("myFilesUser") || "User",
@@ -1621,7 +1625,24 @@ function renderFolderPage() {
         )
     );
 
+    const breadcrumbs = [];
+    let cursor = folder;
+    while (cursor) {
+        breadcrumbs.unshift(cursor);
+        cursor = state.folders.find(item => String(item.id) === String(cursor.parent_id));
+    }
+
     document.getElementById("content").innerHTML = `
+        <div class="breadcrumb">
+            <button onclick="navigate('Home')">Home</button>
+            ${breadcrumbs.map((item, index) => `
+                <span>›</span>
+                ${index === breadcrumbs.length - 1
+                    ? `<span class="current">${escapeHTML(item.name)}</span>`
+                    : `<button onclick="openFolder('${escapeAttribute(item.id)}')">${escapeHTML(item.name)}</button>`}
+            `).join("")}
+        </div>
+
         <div class="page-head">
             <div>
                 <h1 class="page-title">${escapeHTML(folder.name)}</h1>
@@ -1996,7 +2017,7 @@ async function createFolder() {
         });
 
         toast("Folder created.");
-
+        await new Promise(resolve => setTimeout(resolve, 700));
         await loadData();
 
     } catch (error) {
@@ -2141,7 +2162,7 @@ async function uploadFileToDrive() {
         closeModal();
 
         toast("File uploaded successfully.");
-
+        await new Promise(resolve => setTimeout(resolve, 700));
         await loadData();
 
     } catch (error) {
@@ -2190,8 +2211,8 @@ function openFileContext(event, id, isTrash = false) {
         x = window.innerWidth - 200;
     }
 
-    if (y + 215 > window.innerHeight) {
-        y = window.innerHeight - 225;
+    if (y + 255 > window.innerHeight) {
+        y = window.innerHeight - 265;
     }
 
     menu.style.left = `${Math.max(8, x)}px`;
@@ -2214,6 +2235,62 @@ function getSelectedFile() {
     return source.find(
         file => String(file.id) === String(state.selectedItem.id)
     );
+}
+
+function moveSelected() {
+    const file = getSelectedFile();
+    if (!file) return;
+
+    hideContextMenu();
+
+    const folders = state.folders.filter(folder => String(folder.id) !== String(file.folder_id));
+    if (!folders.length) {
+        toast("Belum ada folder tujuan lain.");
+        return;
+    }
+
+    showModal(`
+        <div class="modal-head">
+            <div class="modal-title">Move to folder</div>
+            <button class="modal-close" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <label class="form-label">Destination folder</label>
+            <select id="moveFolderSelect" class="form-input" style="height:45px;">
+                ${folders.map(folder => `
+                    <option value="${escapeAttribute(folder.id)}">${escapeHTML(folder.name)}</option>
+                `).join("")}
+            </select>
+            <div style="margin-top:10px;color:var(--muted);font-size:11px;">
+                ${escapeHTML(file.name)} will be moved in Google Drive and in MYNOTE.
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="confirmMove()">Move</button>
+            </div>
+        </div>
+    `);
+}
+
+async function confirmMove() {
+    const file = getSelectedFile();
+    const select = document.getElementById("moveFolderSelect");
+    if (!file || !select) return;
+
+    try {
+        closeModal();
+        toast("Moving...");
+        await apiPost("moveItem", {
+            id: file.id,
+            drive_id: file.drive_id || "",
+            folder_id: select.value
+        });
+        await new Promise(resolve => setTimeout(resolve, 700));
+        toast("Item moved successfully.");
+        await loadData();
+    } catch (error) {
+        toast(error.message);
+    }
 }
 
 function renameSelected() {
@@ -2361,6 +2438,7 @@ async function createNote() {
         await apiPost("createNote", {name, content, folder_id: folderId});
         closeModal();
         toast("Note created.");
+        await new Promise(resolve => setTimeout(resolve, 700));
         await loadData();
     } catch (error) {
         toast(error.message);
@@ -2427,6 +2505,7 @@ async function createLink() {
         await apiPost("createLink", {name, url, note, folder_id: folderId});
         closeModal();
         toast("Link saved.");
+        await new Promise(resolve => setTimeout(resolve, 700));
         await loadData();
     } catch (error) {
         toast(error.message);
