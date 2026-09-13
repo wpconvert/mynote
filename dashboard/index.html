@@ -1201,36 +1201,44 @@ function apiGet(action) {
             Math.random().toString(36).slice(2);
 
         const script = document.createElement("script");
+        let finished = false;
 
         const timer = setTimeout(() => {
-            cleanup();
+            finish();
             reject(new Error("GAS tidak merespons."));
         }, 15000);
 
-        function cleanup() {
+        function finish() {
+            if (finished) return;
+            finished = true;
             clearTimeout(timer);
             delete window[callbackName];
             script.remove();
         }
 
         window[callbackName] = data => {
-            cleanup();
+            if (finished) return;
 
             if (!data || data.success === false) {
+                finish();
                 reject(new Error(data?.message || "Gagal mengambil data."));
                 return;
             }
 
+            finish();
             resolve(data);
         };
 
+        const separator = GAS_URL.includes("?") ? "&" : "?";
+
         script.src =
             GAS_URL +
-            "?action=" + encodeURIComponent(action) +
+            separator +
+            "action=" + encodeURIComponent(action) +
             "&callback=" + encodeURIComponent(callbackName);
 
         script.onerror = () => {
-            cleanup();
+            finish();
             reject(new Error("Gagal menghubungi MYNOTE."));
         };
 
@@ -1239,19 +1247,25 @@ function apiGet(action) {
 }
 
 async function apiPost(action, data = {}) {
-    await fetch(GAS_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-            "Content-Type": "text/plain;charset=utf-8"
-        },
-        body: JSON.stringify({
-            action,
-            ...data
-        })
+    const payload = JSON.stringify({
+        action,
+        ...data
     });
 
-    return { success: true };
+    try {
+        await fetch(GAS_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: {
+                "Content-Type": "text/plain;charset=utf-8"
+            },
+            body: payload
+        });
+
+        return { success: true };
+    } catch (error) {
+        throw new Error("Gagal mengirim perubahan ke MYNOTE.");
+    }
 }
 
 async function loadData() {
