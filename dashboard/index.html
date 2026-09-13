@@ -1,0 +1,3865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>My Files</title>
+
+    <style>
+
+        /* =========================================================
+           RESET
+        ========================================================= */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+
+            --bg: #f6f7f9;
+            --surface: #ffffff;
+            --surface-hover: #f7f8fa;
+            --surface-soft: #f0f2f5;
+
+            --text: #17191d;
+            --text-soft: #555c65;
+            --muted: #858c95;
+
+            --border: #e5e7eb;
+
+            --primary: #17191d;
+            --primary-hover: #2b2f35;
+
+            --danger: #c0392b;
+
+            --sidebar-width: 250px;
+
+            --radius-sm: 9px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+
+            --shadow:
+                0 16px 45px rgba(15, 23, 42, 0.08);
+        }
+
+
+        /* =========================================================
+           BODY
+        ========================================================= */
+
+        body {
+
+            min-height: 100vh;
+
+            background: var(--bg);
+
+            color: var(--text);
+
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                sans-serif;
+
+            font-size: 14px;
+
+            overflow-x: hidden;
+        }
+
+
+        button,
+        input {
+
+            font-family: inherit;
+        }
+
+
+        button {
+
+            border: none;
+
+            cursor: pointer;
+        }
+
+
+        /* =========================================================
+           APP
+        ========================================================= */
+
+        .app {
+
+            min-height: 100vh;
+
+            display: flex;
+        }
+
+
+        /* =========================================================
+           SIDEBAR
+        ========================================================= */
+
+        .sidebar {
+
+            position: fixed;
+
+            top: 0;
+            left: 0;
+            bottom: 0;
+
+            width: var(--sidebar-width);
+
+            display: flex;
+            flex-direction: column;
+
+            padding: 20px 14px;
+
+            background: var(--surface);
+
+            border-right:
+                1px solid var(--border);
+
+            z-index: 100;
+
+            transition:
+                transform 0.25s ease;
+        }
+
+
+        /* Brand */
+
+        .brand {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 11px;
+
+            padding:
+                3px 9px 25px;
+        }
+
+
+        .brand-logo {
+
+            width: 36px;
+            height: 36px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 11px;
+
+            background: var(--primary);
+
+            color: white;
+
+            font-size: 14px;
+
+            font-weight: 900;
+        }
+
+
+        .brand-name {
+
+            display: block;
+
+            font-size: 14px;
+
+            font-weight: 750;
+        }
+
+
+        .brand-subtitle {
+
+            display: block;
+
+            margin-top: 2px;
+
+            color: var(--muted);
+
+            font-size: 10px;
+        }
+
+
+        /* Navigation */
+
+        .nav-section {
+
+            margin:
+                14px 9px 6px;
+
+            color: #9ba1a9;
+
+            font-size: 9px;
+
+            font-weight: 850;
+
+            letter-spacing: .13em;
+
+            text-transform: uppercase;
+        }
+
+
+        .nav-item {
+
+            width: 100%;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 11px;
+
+            padding:
+                10px 11px;
+
+            margin-bottom: 2px;
+
+            border-radius: 10px;
+
+            background: transparent;
+
+            color: #646b74;
+
+            text-align: left;
+
+            font-size: 12px;
+
+            transition:
+                background .15s ease,
+                color .15s ease;
+        }
+
+
+        .nav-item:hover {
+
+            background: var(--surface-soft);
+
+            color: var(--text);
+        }
+
+
+        .nav-item.active {
+
+            background: var(--surface-soft);
+
+            color: var(--text);
+
+            font-weight: 750;
+        }
+
+
+        .nav-icon {
+
+            width: 19px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            font-size: 14px;
+        }
+
+
+        /* Folder navigation */
+
+        .folder-navigation {
+
+            display: flex;
+
+            flex-direction: column;
+        }
+
+
+        .folder-nav-item {
+
+            width: 100%;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            padding:
+                8px 11px;
+
+            border-radius: 9px;
+
+            background: transparent;
+
+            color: var(--muted);
+
+            text-align: left;
+
+            font-size: 11px;
+        }
+
+
+        .folder-nav-item:hover {
+
+            background: var(--surface-soft);
+
+            color: var(--text);
+        }
+
+
+        /* Sidebar Account */
+
+        .sidebar-account {
+
+            margin-top: auto;
+
+            padding:
+                15px 6px 2px;
+
+            border-top:
+                1px solid var(--border);
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 9px;
+        }
+
+
+        .avatar {
+
+            width: 32px;
+            height: 32px;
+
+            flex-shrink: 0;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background: var(--surface-soft);
+
+            color: var(--text);
+
+            font-size: 11px;
+
+            font-weight: 850;
+        }
+
+
+        .avatar.small {
+
+            width: 28px;
+            height: 28px;
+        }
+
+
+        .account-details {
+
+            min-width: 0;
+
+            flex: 1;
+        }
+
+
+        .account-details strong {
+
+            display: block;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+
+            white-space: nowrap;
+
+            font-size: 11px;
+        }
+
+
+        .account-details span {
+
+            display: block;
+
+            margin-top: 2px;
+
+            color: var(--muted);
+
+            font-size: 10px;
+        }
+
+
+        .account-menu-button {
+
+            width: 30px;
+            height: 30px;
+
+            border-radius: 8px;
+
+            background: transparent;
+
+            color: var(--muted);
+
+            font-size: 12px;
+        }
+
+
+        .account-menu-button:hover {
+
+            background: var(--surface-soft);
+
+            color: var(--text);
+        }
+
+
+        /* =========================================================
+           MAIN
+        ========================================================= */
+
+        .main {
+
+            width: calc(100% - var(--sidebar-width));
+
+            min-height: 100vh;
+
+            margin-left: var(--sidebar-width);
+        }
+
+
+        /* =========================================================
+           TOPBAR
+        ========================================================= */
+
+        .topbar {
+
+            position: sticky;
+
+            top: 0;
+
+            height: 78px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 18px;
+
+            padding:
+                0 28px;
+
+            background:
+                rgba(255, 255, 255, .88);
+
+            backdrop-filter:
+                blur(14px);
+
+            border-bottom:
+                1px solid var(--border);
+
+            z-index: 50;
+        }
+
+
+        .mobile-menu {
+
+            display: none;
+
+            width: 35px;
+            height: 35px;
+
+            border-radius: 9px;
+
+            background: transparent;
+
+            color: var(--muted);
+
+            font-size: 17px;
+        }
+
+
+        .mobile-menu:hover {
+
+            background: var(--surface-soft);
+        }
+
+
+        .page-heading {
+
+            flex: 1;
+        }
+
+
+        .page-heading small {
+
+            color: var(--muted);
+
+            font-size: 9px;
+
+            font-weight: 700;
+
+            letter-spacing: .14em;
+        }
+
+
+        .page-heading h1 {
+
+            margin-top: 3px;
+
+            font-size: 20px;
+
+            font-weight: 750;
+        }
+
+
+        .topbar-actions {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 9px;
+        }
+
+
+        /* Search */
+
+        .search-box {
+
+            width: 300px;
+            height: 39px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            padding:
+                0 11px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 11px;
+
+            background: var(--surface);
+
+            color: var(--muted);
+        }
+
+
+        .search-box input {
+
+            width: 100%;
+
+            border: none;
+
+            outline: none;
+
+            background: transparent;
+
+            color: var(--text);
+
+            font-size: 11px;
+        }
+
+
+        /* Top buttons */
+
+        .icon-button {
+
+            width: 36px;
+            height: 36px;
+
+            border-radius: 9px;
+
+            background: transparent;
+
+            color: var(--muted);
+
+            font-size: 14px;
+        }
+
+
+        .icon-button:hover {
+
+            background: var(--surface-soft);
+
+            color: var(--text);
+        }
+
+
+        .profile-button {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+            padding:
+                4px 10px 4px 4px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 22px;
+
+            background: var(--surface);
+
+            color: var(--text);
+
+            font-size: 11px;
+        }
+
+
+        /* =========================================================
+           CONTENT
+        ========================================================= */
+
+        .content {
+
+            max-width: 1500px;
+
+            margin: 0 auto;
+
+            padding: 28px;
+        }
+
+
+        /* Toolbar */
+
+        .content-toolbar {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+            margin-bottom: 25px;
+        }
+
+
+        .breadcrumb {
+
+            color: var(--muted);
+
+            font-size: 11px;
+        }
+
+
+        .breadcrumb strong {
+
+            color: var(--text);
+        }
+
+
+        .toolbar-actions {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+        }
+
+
+        /* Buttons */
+
+        .button {
+
+            min-height: 38px;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 7px;
+
+            padding:
+                0 13px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 10px;
+
+            background: var(--surface);
+
+            color: var(--text);
+
+            font-size: 11px;
+
+            font-weight: 750;
+
+            transition:
+                background .15s ease,
+                transform .1s ease;
+        }
+
+
+        .button:hover {
+
+            background: var(--surface-soft);
+        }
+
+
+        .button:active {
+
+            transform: scale(.98);
+        }
+
+
+        .button.primary {
+
+            background: var(--primary);
+
+            border-color: var(--primary);
+
+            color: white;
+        }
+
+
+        .button.primary:hover {
+
+            background: var(--primary-hover);
+        }
+
+
+        .button.danger {
+
+            color: var(--danger);
+        }
+
+
+        /* =========================================================
+           SECTION
+        ========================================================= */
+
+        .section-title {
+
+            margin-bottom: 11px;
+
+            font-size: 13px;
+
+            font-weight: 750;
+        }
+
+
+        /* =========================================================
+           FOLDER CARDS
+        ========================================================= */
+
+        .folder-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fill, minmax(185px, 1fr));
+
+            gap: 11px;
+
+            margin-bottom: 28px;
+        }
+
+
+        .folder-card {
+
+            min-height: 116px;
+
+            padding: 16px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 14px;
+
+            background: var(--surface);
+
+            cursor: pointer;
+
+            transition:
+                transform .15s ease,
+                box-shadow .15s ease,
+                border-color .15s ease;
+        }
+
+
+        .folder-card:hover {
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 12px 30px
+                rgba(15, 23, 42, .07);
+
+            border-color:
+                #d9dce1;
+        }
+
+
+        .folder-icon {
+
+            margin-bottom: 17px;
+
+            font-size: 25px;
+        }
+
+
+        .folder-card strong {
+
+            display: block;
+
+            margin-bottom: 4px;
+
+            font-size: 12px;
+        }
+
+
+        .folder-card span {
+
+            display: block;
+
+            overflow: hidden;
+
+            color: var(--muted);
+
+            font-size: 10px;
+
+            text-overflow: ellipsis;
+
+            white-space: nowrap;
+        }
+
+
+        /* =========================================================
+           FILE LIST
+        ========================================================= */
+
+        .file-list {
+
+            overflow: hidden;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 14px;
+
+            background: var(--surface);
+        }
+
+
+        .file-row {
+
+            min-height: 62px;
+
+            display: grid;
+
+            grid-template-columns:
+                38px
+                minmax(200px, 1fr)
+                110px
+                190px
+                90px;
+
+            align-items: center;
+
+            gap: 8px;
+
+            padding:
+                10px 15px;
+
+            border-bottom:
+                1px solid var(--border);
+        }
+
+
+        .file-row:last-child {
+
+            border-bottom: none;
+        }
+
+
+        .file-row.header {
+
+            min-height: 40px;
+
+            background:
+                var(--surface-soft);
+
+            color: var(--muted);
+
+            font-size: 9px;
+
+            font-weight: 850;
+
+            letter-spacing: .04em;
+
+            text-transform: uppercase;
+        }
+
+
+        .file-icon {
+
+            color: var(--muted);
+
+            font-size: 14px;
+        }
+
+
+        .file-name {
+
+            min-width: 0;
+        }
+
+
+        .file-name strong {
+
+            display: block;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+
+            white-space: nowrap;
+
+            font-size: 11px;
+        }
+
+
+        .file-name span {
+
+            display: block;
+
+            margin-top: 3px;
+
+            overflow: hidden;
+
+            color: var(--muted);
+
+            text-overflow: ellipsis;
+
+            white-space: nowrap;
+
+            font-size: 9px;
+        }
+
+
+        .file-type,
+        .file-note {
+
+            overflow: hidden;
+
+            color: var(--muted);
+
+            font-size: 10px;
+
+            text-overflow: ellipsis;
+
+            white-space: nowrap;
+        }
+
+
+        .file-actions {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: flex-end;
+
+            gap: 2px;
+        }
+
+
+        .row-button {
+
+            padding:
+                5px 6px;
+
+            border-radius: 7px;
+
+            background: transparent;
+
+            color: var(--muted);
+
+            font-size: 10px;
+        }
+
+
+        .row-button:hover {
+
+            background: var(--surface-soft);
+
+            color: var(--text);
+        }
+
+
+        /* Empty */
+
+        .empty-state {
+
+            padding: 65px 20px;
+
+            text-align: center;
+
+            color: var(--muted);
+
+            font-size: 11px;
+        }
+
+
+        .empty-state h3 {
+
+            margin-bottom: 6px;
+
+            color: var(--text);
+
+            font-size: 14px;
+        }
+
+
+        /* =========================================================
+           MODAL
+        ========================================================= */
+
+        .modal-overlay {
+
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 1000;
+
+            display: none;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 20px;
+
+            background:
+                rgba(15, 23, 42, .40);
+
+            backdrop-filter:
+                blur(3px);
+        }
+
+
+        .modal-overlay.show {
+
+            display: flex;
+        }
+
+
+        .modal {
+
+            width: min(450px, 100%);
+
+            padding: 23px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 18px;
+
+            background: var(--surface);
+
+            box-shadow:
+                0 30px 80px
+                rgba(0, 0, 0, .20);
+
+            animation:
+                modalIn .16s ease;
+        }
+
+
+        @keyframes modalIn {
+
+            from {
+
+                opacity: 0;
+
+                transform:
+                    translateY(8px)
+                    scale(.98);
+            }
+
+            to {
+
+                opacity: 1;
+
+                transform:
+                    translateY(0)
+                    scale(1);
+            }
+        }
+
+
+        .modal h2 {
+
+            margin-bottom: 7px;
+
+            font-size: 17px;
+        }
+
+
+        .modal-description {
+
+            margin-bottom: 18px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+
+            line-height: 1.6;
+        }
+
+
+        .form-field {
+
+            margin-top: 14px;
+        }
+
+
+        .form-field label {
+
+            display: block;
+
+            margin-bottom: 7px;
+
+            font-size: 11px;
+
+            font-weight: 750;
+        }
+
+
+        .form-field input {
+
+            width: 100%;
+
+            height: 42px;
+
+            padding:
+                0 11px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 10px;
+
+            outline: none;
+
+            background: var(--surface);
+
+            color: var(--text);
+
+            font-size: 11px;
+        }
+
+
+        .form-field input:focus {
+
+            border-color:
+                #9ca3af;
+        }
+
+
+        .modal-actions {
+
+            display: flex;
+
+            justify-content: flex-end;
+
+            gap: 8px;
+
+            margin-top: 22px;
+        }
+
+
+        /* =========================================================
+           CONTEXT MENU
+        ========================================================= */
+
+        .context-menu {
+
+            position: fixed;
+
+            z-index: 1200;
+
+            display: none;
+
+            min-width: 155px;
+
+            padding: 5px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 11px;
+
+            background: var(--surface);
+
+            box-shadow: var(--shadow);
+        }
+
+
+        .context-menu button {
+
+            width: 100%;
+
+            display: block;
+
+            padding:
+                9px 10px;
+
+            border-radius: 7px;
+
+            background: transparent;
+
+            color: var(--text);
+
+            text-align: left;
+
+            font-size: 10px;
+        }
+
+
+        .context-menu button:hover {
+
+            background: var(--surface-soft);
+        }
+
+
+        /* =========================================================
+           TOAST
+        ========================================================= */
+
+        .toast {
+
+            position: fixed;
+
+            right: 25px;
+
+            bottom: 25px;
+
+            z-index: 1500;
+
+            max-width: 300px;
+
+            padding:
+                11px 14px;
+
+            border-radius: 10px;
+
+            background: #17191d;
+
+            color: white;
+
+            font-size: 11px;
+
+            opacity: 0;
+
+            pointer-events: none;
+
+            transform:
+                translateY(10px);
+
+            transition:
+                opacity .2s ease,
+                transform .2s ease;
+        }
+
+
+        .toast.show {
+
+            opacity: 1;
+
+            transform:
+                translateY(0);
+        }
+
+
+        /* =========================================================
+           DARK MODE
+        ========================================================= */
+
+        body.dark {
+
+            --bg: #111315;
+
+            --surface: #181b1f;
+
+            --surface-hover: #1e2227;
+
+            --surface-soft: #23272c;
+
+            --text: #f3f4f6;
+
+            --text-soft: #d1d5db;
+
+            --muted: #9ca3af;
+
+            --border: #2d3239;
+
+            --primary: #f3f4f6;
+
+            --primary-hover: #ffffff;
+        }
+
+
+        body.dark .brand-logo {
+
+            background: #f3f4f6;
+
+            color: #111315;
+        }
+
+
+        body.dark .button.primary {
+
+            background: #f3f4f6;
+
+            color: #111315;
+        }
+
+
+        body.dark .topbar {
+
+            background:
+                rgba(24, 27, 31, .88);
+        }
+
+
+        /* =========================================================
+           MOBILE
+        ========================================================= */
+
+        @media (max-width: 900px) {
+
+            .sidebar {
+
+                transform:
+                    translateX(-100%);
+            }
+
+
+            .sidebar.open {
+
+                transform:
+                    translateX(0);
+            }
+
+
+            .main {
+
+                width: 100%;
+
+                margin-left: 0;
+            }
+
+
+            .mobile-menu {
+
+                display: block;
+            }
+
+
+            .topbar {
+
+                padding:
+                    0 16px;
+            }
+
+
+            .search-box {
+
+                width: 230px;
+            }
+
+
+            .content {
+
+                padding:
+                    20px 16px;
+            }
+
+
+            .file-row {
+
+                grid-template-columns:
+                    32px
+                    minmax(150px, 1fr)
+                    75px
+                    85px;
+            }
+
+
+            .file-note {
+
+                display: none;
+            }
+
+        }
+
+
+        @media (max-width: 620px) {
+
+            .topbar-actions {
+
+                gap: 4px;
+            }
+
+
+            .search-box {
+
+                width: 42vw;
+            }
+
+
+            .profile-button strong {
+
+                display: none;
+            }
+
+
+            .content-toolbar {
+
+                align-items:
+                    flex-start;
+
+                flex-direction:
+                    column;
+            }
+
+
+            .toolbar-actions {
+
+                width: 100%;
+            }
+
+
+            .toolbar-actions .button {
+
+                flex: 1;
+            }
+
+
+            .folder-grid {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+
+            .file-row {
+
+                grid-template-columns:
+                    30px
+                    minmax(130px, 1fr)
+                    60px;
+            }
+
+
+            .file-type {
+
+                display: none;
+            }
+
+
+            .file-actions {
+
+                justify-content:
+                    flex-end;
+            }
+
+        }
+
+
+        @media (max-width: 430px) {
+
+            .search-box {
+
+                width: 45vw;
+            }
+
+
+            .search-box input {
+
+                font-size: 10px;
+            }
+
+
+            .folder-grid {
+
+                grid-template-columns:
+                    1fr 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="app">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside
+        class="sidebar"
+        id="sidebar"
+    >
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                M
+            </div>
+
+            <div>
+
+                <span class="brand-name">
+                    My Files
+                </span>
+
+                <span class="brand-subtitle">
+                    Cloud workspace
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <nav>
+
+
+            <div class="nav-section">
+                MY FILES
+            </div>
+
+
+            <button
+                class="nav-item active"
+                data-page="Home"
+                onclick="navigate('Home')"
+            >
+
+                <span class="nav-icon">
+                    ⌂
+                </span>
+
+                Home
+
+            </button>
+
+
+            <button
+                class="nav-item"
+                data-page="Favorites"
+                onclick="navigate('Favorites')"
+            >
+
+                <span class="nav-icon">
+                    ★
+                </span>
+
+                Favorites
+
+            </button>
+
+
+            <button
+                class="nav-item"
+                data-page="Recent"
+                onclick="navigate('Recent')"
+            >
+
+                <span class="nav-icon">
+                    ◷
+                </span>
+
+                Recent
+
+            </button>
+
+
+            <div class="nav-section">
+                FOLDERS
+            </div>
+
+
+            <div
+                class="folder-navigation"
+                id="folderNavigation"
+            ></div>
+
+
+            <div class="nav-section">
+                SYSTEM
+            </div>
+
+
+            <button
+                class="nav-item"
+                data-page="Settings"
+                onclick="navigate('Settings')"
+            >
+
+                <span class="nav-icon">
+                    ⚙
+                </span>
+
+                Settings
+
+            </button>
+
+
+            <button
+                class="nav-item"
+                data-page="Trash"
+                onclick="navigate('Trash')"
+            >
+
+                <span class="nav-icon">
+                    ♲
+                </span>
+
+                Trash
+
+            </button>
+
+
+        </nav>
+
+
+        <div class="sidebar-account">
+
+            <div class="avatar">
+                U
+            </div>
+
+
+            <div class="account-details">
+
+                <strong id="sidebarUsername">
+                    User
+                </strong>
+
+                <span>
+                    Account
+                </span>
+
+            </div>
+
+
+            <button
+                class="account-menu-button"
+                onclick="openAccountMenu()"
+            >
+                •••
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+
+            <button
+                class="mobile-menu"
+                onclick="toggleSidebar()"
+            >
+                ☰
+            </button>
+
+
+            <div class="page-heading">
+
+                <small>
+                    WORKSPACE
+                </small>
+
+                <h1 id="pageTitle">
+                    Home
+                </h1>
+
+            </div>
+
+
+            <div class="topbar-actions">
+
+
+                <div class="search-box">
+
+                    <span>
+                        ⌕
+                    </span>
+
+                    <input
+                        id="searchInput"
+                        type="text"
+                        placeholder="Search files and folders..."
+                        oninput="renderContent()"
+                    >
+
+                </div>
+
+
+                <button
+                    class="icon-button"
+                    onclick="toggleTheme()"
+                    title="Toggle theme"
+                >
+                    ◐
+                </button>
+
+
+                <button
+                    class="profile-button"
+                    onclick="openAccountMenu()"
+                >
+
+                    <span class="avatar small">
+                        U
+                    </span>
+
+                    <strong id="topUsername">
+                        User
+                    </strong>
+
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <!-- CONTENT -->
+
+        <section class="content">
+
+            <div
+                id="dashboardContent"
+            ></div>
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+<!-- =========================================================
+     CUSTOM MODAL
+========================================================== -->
+
+<div
+    class="modal-overlay"
+    id="modalOverlay"
+>
+
+    <div
+        class="modal"
+        id="modal"
+    ></div>
+
+</div>
+
+
+<!-- =========================================================
+     CUSTOM CONTEXT MENU
+========================================================== -->
+
+<div
+    class="context-menu"
+    id="contextMenu"
+></div>
+
+
+<!-- =========================================================
+     TOAST
+========================================================== -->
+
+<div
+    class="toast"
+    id="toast"
+></div>
+
+
+<script>
+
+    /* =========================================================
+       STATE
+    ========================================================= */
+
+    const state = {
+
+        user:
+            sessionStorage.getItem(
+                "myFilesUser"
+            ) || "User",
+
+        page:
+            "Home",
+
+        currentFolder:
+            "ROOT",
+
+        theme:
+            localStorage.getItem(
+                "myFilesTheme"
+            ) || "light",
+
+        items: [
+
+            {
+                id: "F001",
+                parent: "ROOT",
+                name: "Projects",
+                type: "folder",
+                note: "Project files"
+            },
+
+            {
+                id: "F002",
+                parent: "ROOT",
+                name: "Assets",
+                type: "folder",
+                note: "Images and resources"
+            },
+
+            {
+                id: "F003",
+                parent: "ROOT",
+                name: "Documents",
+                type: "folder",
+                note: "Personal documents"
+            },
+
+            {
+                id: "F004",
+                parent: "ROOT",
+                name: "Servers",
+                type: "folder",
+                note: "Server configuration"
+            },
+
+            {
+                id: "A001",
+                parent: "ROOT",
+                name: "index.html",
+                type: "HTML",
+                note: "Dashboard homepage",
+                favorite: true
+            },
+
+            {
+                id: "A002",
+                parent: "ROOT",
+                name: "config.js",
+                type: "JS",
+                note: "Application settings"
+            },
+
+            {
+                id: "A003",
+                parent: "ROOT",
+                name: "README.md",
+                type: "Markdown",
+                note: "Project notes",
+                favorite: true
+            },
+
+            {
+                id: "A004",
+                parent: "ROOT",
+                name: "backup.zip",
+                type: "ZIP",
+                note: "Latest backup"
+            }
+
+        ],
+
+        trash: []
+
+    };
+
+
+    /* =========================================================
+       INITIALIZE
+    ========================================================= */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            document.body.classList.toggle(
+                "dark",
+                state.theme === "dark"
+            );
+
+
+            document.getElementById(
+                "sidebarUsername"
+            ).textContent =
+                state.user;
+
+
+            document.getElementById(
+                "topUsername"
+            ).textContent =
+                state.user;
+
+
+            renderFolders();
+
+            renderContent();
+
+
+            document.addEventListener(
+                "click",
+                function (event) {
+
+                    if (
+                        !event.target.closest(
+                            ".context-menu"
+                        )
+                    ) {
+
+                        hideContextMenu();
+
+                    }
+
+                }
+            );
+
+
+            document.addEventListener(
+                "contextmenu",
+                function (event) {
+
+                    const element =
+                        event.target.closest(
+                            "[data-id]"
+                        );
+
+
+                    if (!element) {
+                        return;
+                    }
+
+
+                    event.preventDefault();
+
+
+                    showContextMenu(
+                        event,
+                        element.dataset.id
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+    /* =========================================================
+       NAVIGATION
+    ========================================================= */
+
+    function navigate(page) {
+
+        state.page = page;
+
+
+        /*
+            Folder menu items
+        */
+
+        const folderNames = [
+            "Projects",
+            "Assets",
+            "Documents",
+            "Servers"
+        ];
+
+
+        if (
+            folderNames.includes(page)
+        ) {
+
+            const folder =
+                state.items.find(
+                    item =>
+                        item.type === "folder" &&
+                        item.name === page
+                );
+
+
+            if (folder) {
+
+                state.currentFolder =
+                    folder.id;
+
+            }
+
+
+            state.page =
+                "Home";
+
+        }
+
+
+        document.getElementById(
+            "pageTitle"
+        ).textContent =
+            page;
+
+
+        document
+            .querySelectorAll(
+                ".nav-item"
+            )
+            .forEach(button => {
+
+                button.classList.toggle(
+                    "active",
+                    button.dataset.page === page
+                );
+
+            });
+
+
+        renderContent();
+
+    }
+
+
+    /* =========================================================
+       FOLDERS
+    ========================================================= */
+
+    function renderFolders() {
+
+        const container =
+            document.getElementById(
+                "folderNavigation"
+            );
+
+
+        const folders =
+            state.items.filter(
+                item =>
+                    item.type === "folder" &&
+                    item.parent === "ROOT"
+            );
+
+
+        container.innerHTML =
+            folders
+                .map(
+                    folder => `
+
+                        <button
+                            class="folder-nav-item"
+                            onclick="openFolder('${folder.id}')"
+                        >
+
+                            <span>
+                                ▰
+                            </span>
+
+                            ${escapeHTML(
+                                folder.name
+                            )}
+
+                        </button>
+
+                    `
+                )
+                .join("");
+
+    }
+
+
+    function openFolder(id) {
+
+        state.currentFolder =
+            id;
+
+        state.page =
+            "Home";
+
+
+        document.getElementById(
+            "pageTitle"
+        ).textContent =
+            "Home";
+
+
+        renderContent();
+
+    }
+
+
+    /* =========================================================
+       RENDER CONTENT
+    ========================================================= */
+
+    function renderContent() {
+
+        if (
+            state.page === "Favorites"
+        ) {
+
+            const files =
+                state.items.filter(
+                    item =>
+                        item.type !== "folder" &&
+                        item.favorite
+                );
+
+
+            renderFilePage(
+                "Favorites",
+                files
+            );
+
+
+            return;
+        }
+
+
+        if (
+            state.page === "Recent"
+        ) {
+
+            const files =
+                state.items.filter(
+                    item =>
+                        item.type !== "folder"
+                );
+
+
+            renderFilePage(
+                "Recent",
+                files
+            );
+
+
+            return;
+        }
+
+
+        if (
+            state.page === "Trash"
+        ) {
+
+            renderTrash();
+
+            return;
+        }
+
+
+        if (
+            state.page === "Settings"
+        ) {
+
+            renderSettings();
+
+            return;
+        }
+
+
+        renderHome();
+
+    }
+
+
+    /* =========================================================
+       HOME
+    ========================================================= */
+
+    function renderHome() {
+
+        const query =
+            document
+                .getElementById(
+                    "searchInput"
+                )
+                .value
+                .toLowerCase()
+                .trim();
+
+
+        const folders =
+            state.items.filter(
+                item =>
+
+                    item.type === "folder" &&
+
+                    item.parent === "ROOT" &&
+
+                    (
+                        !query ||
+
+                        item.name
+                            .toLowerCase()
+                            .includes(query)
+                    )
+            );
+
+
+        const files =
+            state.items.filter(
+                item =>
+
+                    item.type !== "folder" &&
+
+                    item.parent ===
+                        state.currentFolder &&
+
+                    (
+                        !query ||
+
+                        (
+                            item.name +
+                            " " +
+                            item.note
+                        )
+                        .toLowerCase()
+                        .includes(query)
+                    )
+            );
+
+
+        document.getElementById(
+            "dashboardContent"
+        ).innerHTML = `
+
+            <div class="content-toolbar">
+
+                <div class="breadcrumb">
+
+                    <strong>
+                        Home
+                    </strong>
+
+                    ${
+                        state.currentFolder !== "ROOT"
+                        ? " / Current folder"
+                        : ""
+                    }
+
+                </div>
+
+
+                <div class="toolbar-actions">
+
+                    <button
+                        class="button"
+                        onclick="createFolder()"
+                    >
+
+                        <span>
+                            ＋
+                        </span>
+
+                        New Folder
+
+                    </button>
+
+
+                    <button
+                        class="button primary"
+                        onclick="uploadFile()"
+                    >
+
+                        <span>
+                            ↑
+                        </span>
+
+                        Upload
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            ${
+                state.currentFolder === "ROOT"
+
+                ?
+
+                `
+
+                    <h3 class="section-title">
+                        Folders
+                    </h3>
+
+
+                    <div class="folder-grid">
+
+                        ${
+                            folders.length
+
+                            ?
+
+                            folders
+                                .map(folderCard)
+                                .join("")
+
+                            :
+
+                            `
+                                <div
+                                    class="empty-state"
+                                    style="grid-column:1/-1"
+                                >
+                                    No folders found.
+                                </div>
+                            `
+                        }
+
+                    </div>
+
+                `
+
+                :
+
+                ""
+            }
+
+
+            <h3 class="section-title">
+
+                ${
+                    state.currentFolder === "ROOT"
+                    ? "Recent files"
+                    : "Files"
+                }
+
+            </h3>
+
+
+            ${fileList(files)}
+
+        `;
+
+    }
+
+
+    /* =========================================================
+       FILE PAGE
+    ========================================================= */
+
+    function renderFilePage(
+        title,
+        files
+    ) {
+
+        const query =
+            document
+                .getElementById(
+                    "searchInput"
+                )
+                .value
+                .toLowerCase()
+                .trim();
+
+
+        files =
+            files.filter(
+                file =>
+
+                    !query ||
+
+                    (
+                        file.name +
+                        " " +
+                        file.note
+                    )
+                    .toLowerCase()
+                    .includes(query)
+            );
+
+
+        document.getElementById(
+            "dashboardContent"
+        ).innerHTML = `
+
+            <div class="content-toolbar">
+
+                <div class="breadcrumb">
+
+                    <strong>
+                        ${title}
+                    </strong>
+
+                </div>
+
+
+                <button
+                    class="button primary"
+                    onclick="uploadFile()"
+                >
+
+                    ↑ Upload
+
+                </button>
+
+            </div>
+
+
+            ${fileList(files)}
+
+        `;
+
+    }
+
+
+    /* =========================================================
+       FOLDER CARD
+    ========================================================= */
+
+    function folderCard(folder) {
+
+        return `
+
+            <div
+                class="folder-card"
+                data-id="${folder.id}"
+                ondblclick="
+                    openFolder('${folder.id}')
+                "
+            >
+
+                <div class="folder-icon">
+                    ▰
+                </div>
+
+
+                <strong>
+                    ${escapeHTML(
+                        folder.name
+                    )}
+                </strong>
+
+
+                <span>
+                    ${escapeHTML(
+                        folder.note ||
+                        "Folder"
+                    )}
+                </span>
+
+            </div>
+
+        `;
+
+    }
+
+
+    /* =========================================================
+       FILE LIST
+    ========================================================= */
+
+    function fileList(
+        files,
+        isTrash = false
+    ) {
+
+        if (!files.length) {
+
+            return `
+
+                <div class="empty-state">
+
+                    <h3>
+                        Nothing here yet
+                    </h3>
+
+                    <p>
+                        Files you add will appear here.
+                    </p>
+
+                </div>
+
+            `;
+
+        }
+
+
+        return `
+
+            <div class="file-list">
+
+                <div class="file-row header">
+
+                    <div></div>
+
+                    <div>
+                        Name
+                    </div>
+
+                    <div>
+                        Type
+                    </div>
+
+                    <div class="file-note">
+                        Note
+                    </div>
+
+                    <div></div>
+
+                </div>
+
+
+                ${
+                    files
+                        .map(
+                            file => `
+
+                                <div
+                                    class="file-row"
+                                    data-id="${file.id}"
+                                >
+
+                                    <div class="file-icon">
+
+                                        ${
+                                            file.favorite
+                                            ? "★"
+                                            : "□"
+                                        }
+
+                                    </div>
+
+
+                                    <div class="file-name">
+
+                                        <strong>
+                                            ${escapeHTML(
+                                                file.name
+                                            )}
+                                        </strong>
+
+                                        <span>
+                                            ${escapeHTML(
+                                                file.note ||
+                                                "No note"
+                                            )}
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="file-type">
+
+                                        ${escapeHTML(
+                                            file.type
+                                        )}
+
+                                    </div>
+
+
+                                    <div class="file-note">
+
+                                        ${escapeHTML(
+                                            file.note ||
+                                            "—"
+                                        )}
+
+                                    </div>
+
+
+                                    <div class="file-actions">
+
+                                        ${
+                                            isTrash
+
+                                            ?
+
+                                            `
+
+                                                <button
+                                                    class="row-button"
+                                                    onclick="
+                                                        restoreItem(
+                                                            '${file.id}'
+                                                        )
+                                                    "
+                                                >
+                                                    Restore
+                                                </button>
+
+                                            `
+
+                                            :
+
+                                            `
+
+                                                <button
+                                                    class="row-button"
+                                                    onclick="
+                                                        previewFile(
+                                                            '${file.id}'
+                                                        )
+                                                    "
+                                                >
+                                                    View
+                                                </button>
+
+
+                                                <button
+                                                    class="row-button"
+                                                    onclick="
+                                                        showContextMenu(
+                                                            event,
+                                                            '${file.id}'
+                                                        )
+                                                    "
+                                                >
+                                                    •••
+                                                </button>
+
+                                            `
+                                        }
+
+                                    </div>
+
+                                </div>
+
+                            `
+                        )
+                        .join("")
+                }
+
+            </div>
+
+        `;
+
+    }
+
+
+    /* =========================================================
+       CREATE FOLDER
+    ========================================================= */
+
+    function createFolder() {
+
+        showModal(`
+
+            <h2>
+                New Folder
+            </h2>
+
+            <p class="modal-description">
+                Create a new folder in the current location.
+            </p>
+
+
+            <div class="form-field">
+
+                <label>
+                    Folder name
+                </label>
+
+                <input
+                    id="newFolderName"
+                    placeholder="e.g. Projects"
+                    autofocus
+                >
+
+            </div>
+
+
+            <div class="form-field">
+
+                <label>
+                    Note
+                </label>
+
+                <input
+                    id="newFolderNote"
+                    placeholder="Optional note"
+                >
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    class="button"
+                    onclick="closeModal()"
+                >
+                    Cancel
+                </button>
+
+
+                <button
+                    class="button primary"
+                    onclick="saveFolder()"
+                >
+                    Create Folder
+                </button>
+
+            </div>
+
+        `);
+
+    }
+
+
+    function saveFolder() {
+
+        const name =
+            document
+                .getElementById(
+                    "newFolderName"
+                )
+                .value
+                .trim();
+
+
+        if (!name) {
+
+            toast(
+                "Please enter a folder name."
+            );
+
+            return;
+        }
+
+
+        state.items.push({
+
+            id:
+                "F" +
+                Date.now(),
+
+            parent:
+                state.currentFolder,
+
+            name:
+                name,
+
+            type:
+                "folder",
+
+            note:
+                document
+                    .getElementById(
+                        "newFolderNote"
+                    )
+                    .value
+                    .trim()
+
+        });
+
+
+        closeModal();
+
+        renderFolders();
+
+        renderContent();
+
+        toast(
+            "Folder created successfully."
+        );
+
+    }
+
+
+    /* =========================================================
+       UPLOAD
+    ========================================================= */
+
+    function uploadFile() {
+
+        showModal(`
+
+            <h2>
+                Upload File
+            </h2>
+
+            <p class="modal-description">
+                Choose a file to add it to the current folder.
+            </p>
+
+
+            <div class="form-field">
+
+                <label>
+                    File
+                </label>
+
+                <input
+                    id="uploadInput"
+                    type="file"
+                >
+
+            </div>
+
+
+            <div class="form-field">
+
+                <label>
+                    Note
+                </label>
+
+                <input
+                    id="uploadNote"
+                    placeholder="Optional note"
+                >
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    class="button"
+                    onclick="closeModal()"
+                >
+                    Cancel
+                </button>
+
+
+                <button
+                    class="button primary"
+                    onclick="saveUpload()"
+                >
+                    Upload
+                </button>
+
+            </div>
+
+        `);
+
+    }
+
+
+    function saveUpload() {
+
+        const input =
+            document.getElementById(
+                "uploadInput"
+            );
+
+
+        const file =
+            input.files[0];
+
+
+        if (!file) {
+
+            toast(
+                "Please choose a file."
+            );
+
+            return;
+        }
+
+
+        const extension =
+            (
+                file.name
+                    .split(".")
+                    .pop() ||
+                "FILE"
+            ).toUpperCase();
+
+
+        state.items.push({
+
+            id:
+                "A" +
+                Date.now(),
+
+            parent:
+                state.currentFolder,
+
+            name:
+                file.name,
+
+            type:
+                extension,
+
+            note:
+                document
+                    .getElementById(
+                        "uploadNote"
+                    )
+                    .value
+                    .trim()
+
+        });
+
+
+        closeModal();
+
+        renderContent();
+
+        toast(
+            "File added successfully."
+        );
+
+    }
+
+
+    /* =========================================================
+       PREVIEW
+    ========================================================= */
+
+    function previewFile(id) {
+
+        const file =
+            state.items.find(
+                item =>
+                    item.id === id
+            );
+
+
+        if (!file) {
+            return;
+        }
+
+
+        showModal(`
+
+            <h2>
+                ${escapeHTML(
+                    file.name
+                )}
+            </h2>
+
+
+            <p class="modal-description">
+                File preview will be connected to
+                Google Drive later.
+            </p>
+
+
+            <div class="empty-state">
+
+                ${escapeHTML(
+                    file.note ||
+                    "No note available."
+                )}
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    class="button"
+                    onclick="closeModal()"
+                >
+                    Close
+                </button>
+
+            </div>
+
+        `);
+
+    }
+
+
+    /* =========================================================
+       CONTEXT MENU
+    ========================================================= */
+
+    function showContextMenu(
+        event,
+        id
+    ) {
+
+        if (event) {
+
+            event.stopPropagation();
+
+        }
+
+
+        const item =
+            state.items.find(
+                x =>
+                    x.id === id
+            );
+
+
+        if (!item) {
+            return;
+        }
+
+
+        const menu =
+            document.getElementById(
+                "contextMenu"
+            );
+
+
+        menu.innerHTML = `
+
+            <button
+                onclick="
+                    renameItem('${id}')
+                "
+            >
+                Rename
+            </button>
+
+
+            <button
+                onclick="
+                    editNote('${id}')
+                "
+            >
+                Edit note
+            </button>
+
+
+            <button
+                onclick="
+                    toggleFavorite('${id}')
+                "
+            >
+
+                ${
+                    item.favorite
+                    ? "Remove from Favorites"
+                    : "Add to Favorites"
+                }
+
+            </button>
+
+
+            <button
+                onclick="
+                    moveToTrash('${id}')
+                "
+            >
+                Move to Trash
+            </button>
+
+        `;
+
+
+        if (event) {
+
+            const menuWidth = 160;
+
+            const menuHeight = 170;
+
+
+            menu.style.left =
+                Math.min(
+                    event.clientX,
+                    window.innerWidth -
+                        menuWidth -
+                        10
+                ) + "px";
+
+
+            menu.style.top =
+                Math.min(
+                    event.clientY,
+                    window.innerHeight -
+                        menuHeight -
+                        10
+                ) + "px";
+
+        }
+
+
+        menu.style.display =
+            "block";
+
+    }
+
+
+    function hideContextMenu() {
+
+        document.getElementById(
+            "contextMenu"
+        ).style.display =
+            "none";
+
+    }
+
+
+    /* =========================================================
+       RENAME
+    ========================================================= */
+
+    function renameItem(id) {
+
+        hideContextMenu();
+
+
+        const item =
+            state.items.find(
+                x =>
+                    x.id === id
+            );
+
+
+        if (!item) {
+            return;
+        }
+
+
+        showModal(`
+
+            <h2>
+                Rename
+            </h2>
+
+
+            <p class="modal-description">
+                Enter a new name for this item.
+            </p>
+
+
+            <div class="form-field">
+
+                <label>
+                    Name
+                </label>
+
+                <input
+                    id="renameInput"
+                    value="${escapeHTML(
+                        item.name
+                    )}"
+                >
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    class="button"
+                    onclick="closeModal()"
+                >
+                    Cancel
+                </button>
+
+
+                <button
+                    class="button primary"
+                    onclick="
+                        saveRename('${id}')
+                    "
+                >
+                    Save
+                </button>
+
+            </div>
+
+        `);
+
+    }
+
+
+    function saveRename(id) {
+
+        const input =
+            document.getElementById(
+                "renameInput"
+            );
+
+
+        const name =
+            input.value.trim();
+
+
+        if (!name) {
+
+            toast(
+                "Name cannot be empty."
+            );
+
+            return;
+        }
+
+
+        const item =
+            state.items.find(
+                x =>
+                    x.id === id
+            );
+
+
+        item.name =
+            name;
+
+
+        closeModal();
+
+        renderFolders();
+
+        renderContent();
+
+        toast(
+            "Item renamed successfully."
+        );
+
+    }
+
+
+    /* =========================================================
+       NOTE
+    ========================================================= */
+
+    function editNote(id) {
+
+        hideContextMenu();
+
+
+        const item =
+            state.items.find(
+                x =>
+                    x.id === id
+            );
+
+
+        if (!item) {
+            return;
+        }
+
+
+        showModal(`
+
+            <h2>
+                Edit Note
+            </h2>
+
+
+            <p class="modal-description">
+                Add a note to help organize this item.
+            </p>
+
+
+            <div class="form-field">
+
+                <label>
+                    Note
+                </label>
+
+                <input
+                    id="noteInput"
+                    value="${escapeHTML(
+                        item.note ||
+                        ""
+                    )}"
+                    placeholder="Enter note..."
+                >
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    class="button"
+                    onclick="closeModal()"
+                >
+                    Cancel
+                </button>
+
+
+                <button
+                    class="button primary"
+                    onclick="
+                        saveNote('${id}')
+                    "
+                >
+                    Save
+                </button>
+
+            </div>
+
+        `);
+
+    }
+
+
+    function saveNote(id) {
+
+        const item =
+            state.items.find(
+                x =>
+                    x.id === id
+            );
+
+
+        item.note =
+            document
+                .getElementById(
+                    "noteInput"
+                )
+                .value;
+
+
+        closeModal();
+
+        renderContent();
+
+        toast(
+            "Note saved."
+        );
+
+    }
+
+
+    /* =========================================================
+       FAVORITE
+    ========================================================= */
+
+    function toggleFavorite(id) {
+
+        hideContextMenu();
+
+
+        const item =
+            state.items.find(
+                x =>
+                    x.id === id
+            );
+
+
+        if (!item) {
+            return;
+        }
+
+
+        item.favorite =
+            !item.favorite;
+
+
+        renderContent();
+
+
+        toast(
+
+            item.favorite
+            ? "Added to Favorites."
+            : "Removed from Favorites."
+
+        );
+
+    }
+
+
+    /* =========================================================
+       TRASH
+    ========================================================= */
+
+    function moveToTrash(id) {
+
+        hideContextMenu();
+
+
+        const item =
+            state.items.find(
+                x =>
+                    x.id === id
+            );
+
+
+        if (!item) {
+            return;
+        }
+
+
+        showModal(`
+
+            <h2>
+                Move to Trash?
+            </h2>
+
+
+            <p class="modal-description">
+
+                <strong>
+                    ${escapeHTML(
+                        item.name
+                    )}
+                </strong>
+
+                will be moved to Trash.
+
+            </p>
+
+
+            <div class="modal-actions">
+
+                <button
+                    class="button"
+                    onclick="closeModal()"
+                >
+                    Cancel
+                </button>
+
+
+                <button
+                    class="button danger"
+                    onclick="
+                        confirmTrash('${id}')
+                    "
+                >
+                    Move to Trash
+                </button>
+
+            </div>
+
+        `);
+
+    }
+
+
+    function confirmTrash(id) {
+
+        const index =
+            state.items.findIndex(
+                x =>
+                    x.id === id
+            );
+
+
+        if (index === -1) {
+            return;
+        }
+
+
+        const item =
+            state.items[index];
+
+
+        state.trash.push({
+
+            ...item,
+
+            originalParent:
+                item.parent
+
+        });
+
+
+        state.items.splice(
+            index,
+            1
+        );
+
+
+        closeModal();
+
+        renderFolders();
+
+        renderContent();
+
+        toast(
+            "Moved to Trash."
+        );
+
+    }
+
+
+    function restoreItem(id) {
+
+        const index =
+            state.trash.findIndex(
+                x =>
+                    x.id === id
+            );
+
+
+        if (index === -1) {
+            return;
+        }
+
+
+        const item =
+            state.trash[index];
+
+
+        state.items.push({
+
+            ...item,
+
+            parent:
+                item.originalParent ||
+                "ROOT"
+
+        });
+
+
+        state.trash.splice(
+            index,
+            1
+        );
+
+
+        renderContent();
+
+        toast(
+            "Item restored."
+        );
+
+    }
+
+
+    /* =========================================================
+       SETTINGS
+    ========================================================= */
+
+    function renderSettings() {
+
+        document.getElementById(
+            "dashboardContent"
+        ).innerHTML = `
+
+            <div class="empty-state">
+
+                <h3>
+                    Settings
+                </h3>
+
+                <p>
+                    Workspace settings will be connected later.
+                </p>
+
+
+                <br>
+
+
+                <button
+                    class="button"
+                    onclick="toggleTheme()"
+                >
+                    Toggle Theme
+                </button>
+
+            </div>
+
+        `;
+
+    }
+
+
+    /* =========================================================
+       ACCOUNT MENU
+    ========================================================= */
+
+    function openAccountMenu() {
+
+        showModal(`
+
+            <h2>
+                ${escapeHTML(
+                    state.user
+                )}
+            </h2>
+
+
+            <p class="modal-description">
+                Account menu.
+            </p>
+
+
+            <div class="modal-actions">
+
+                <button
+                    class="button"
+                    onclick="closeModal()"
+                >
+                    Close
+                </button>
+
+
+                <button
+                    class="button danger"
+                    onclick="logout()"
+                >
+                    Log out
+                </button>
+
+            </div>
+
+        `);
+
+    }
+
+
+    function logout() {
+
+        sessionStorage.removeItem(
+            "myFilesUser"
+        );
+
+
+        /*
+            Untuk sekarang kembali
+            ke halaman login.
+
+            Kalau login.html sudah dibuat,
+            arahkan ke sana.
+        */
+
+        window.location.href =
+            "login.html";
+
+    }
+
+
+    /* =========================================================
+       MODAL
+    ========================================================= */
+
+    function showModal(content) {
+
+        document.getElementById(
+            "modal"
+        ).innerHTML =
+            content;
+
+
+        document.getElementById(
+            "modalOverlay"
+        ).classList.add(
+            "show"
+        );
+
+
+        setTimeout(
+            function () {
+
+                const input =
+                    document.querySelector(
+                        "#modal input"
+                    );
+
+
+                if (input) {
+
+                    input.focus();
+
+                }
+
+            },
+            30
+        );
+
+    }
+
+
+    function closeModal() {
+
+        document.getElementById(
+            "modalOverlay"
+        ).classList.remove(
+            "show"
+        );
+
+    }
+
+
+    /* =========================================================
+       TOAST
+    ========================================================= */
+
+    function toast(message) {
+
+        const element =
+            document.getElementById(
+                "toast"
+            );
+
+
+        element.textContent =
+            message;
+
+
+        element.classList.add(
+            "show"
+        );
+
+
+        clearTimeout(
+            window.toastTimer
+        );
+
+
+        window.toastTimer =
+            setTimeout(
+                function () {
+
+                    element.classList.remove(
+                        "show"
+                    );
+
+                },
+                2300
+            );
+
+    }
+
+
+    /* =========================================================
+       THEME
+    ========================================================= */
+
+    function toggleTheme() {
+
+        state.theme =
+            state.theme === "dark"
+            ? "light"
+            : "dark";
+
+
+        document.body.classList.toggle(
+            "dark",
+            state.theme === "dark"
+        );
+
+
+        localStorage.setItem(
+            "myFilesTheme",
+            state.theme
+        );
+
+
+        renderContent();
+
+    }
+
+
+    /* =========================================================
+       MOBILE SIDEBAR
+    ========================================================= */
+
+    function toggleSidebar() {
+
+        document
+            .getElementById(
+                "sidebar"
+            )
+            .classList.toggle(
+                "open"
+            );
+
+    }
+
+
+    /* =========================================================
+       MODAL BACKDROP
+    ========================================================= */
+
+    document.addEventListener(
+        "click",
+        function (event) {
+
+            const overlay =
+                document.getElementById(
+                    "modalOverlay"
+                );
+
+
+            if (
+                event.target === overlay
+            ) {
+
+                closeModal();
+
+            }
+
+        }
+    );
+
+
+    /* =========================================================
+       ESCAPE HTML
+    ========================================================= */
+
+    function escapeHTML(value) {
+
+        return String(
+            value ?? ""
+        ).replace(
+            /[&<>"']/g,
+            character => ({
+
+                "&":
+                    "&amp;",
+
+                "<":
+                    "&lt;",
+
+                ">":
+                    "&gt;",
+
+                '"':
+                    "&quot;",
+
+                "'":
+                    "&#039;"
+
+            })[character]
+        );
+
+    }
+
+</script>
+
+
+</body>
+</html>
