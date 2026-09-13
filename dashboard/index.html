@@ -1150,7 +1150,7 @@ body.dark .storage-fill {
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycby4HSKrAQZyfRsVutdQWUnCYPLXsFyNhFYs65zItCoyv2uDW6h6BNygYlHnYSfnc1LrSg/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwUjGidgRVrDSqh3YH6JJV_bWkF90InLH0epYFWGmj5_jIkTfUm5DVvuXWY0OgvW-At/exec";
 
 const state = {
     user: sessionStorage.getItem("myFilesUser") || "User",
@@ -1194,34 +1194,71 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadData();
 });
 
-async function api(action, data = {}) {
-    const payload = {
-        action,
-        ...data
-    };
+function apiGet(action) {
+    return new Promise((resolve, reject) => {
+        const callbackName =
+            "mynote_" + Date.now() + "_" +
+            Math.random().toString(36).slice(2);
 
-    const response = await fetch(GAS_URL, {
+        const script = document.createElement("script");
+
+        const timer = setTimeout(() => {
+            cleanup();
+            reject(new Error("GAS tidak merespons."));
+        }, 15000);
+
+        function cleanup() {
+            clearTimeout(timer);
+            delete window[callbackName];
+            script.remove();
+        }
+
+        window[callbackName] = data => {
+            cleanup();
+
+            if (!data || data.success === false) {
+                reject(new Error(data?.message || "Gagal mengambil data."));
+                return;
+            }
+
+            resolve(data);
+        };
+
+        script.src =
+            GAS_URL +
+            "?action=" + encodeURIComponent(action) +
+            "&callback=" + encodeURIComponent(callbackName);
+
+        script.onerror = () => {
+            cleanup();
+            reject(new Error("Gagal menghubungi MYNOTE."));
+        };
+
+        document.body.appendChild(script);
+    });
+}
+
+async function apiPost(action, data = {}) {
+    await fetch(GAS_URL, {
         method: "POST",
+        mode: "no-cors",
         headers: {
             "Content-Type": "text/plain;charset=utf-8"
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+            action,
+            ...data
+        })
     });
 
-    const text = await response.text();
-
-    try {
-        return JSON.parse(text);
-    } catch {
-        throw new Error("Response GAS tidak valid.");
-    }
+    return { success: true };
 }
 
 async function loadData() {
     try {
         const [filesResponse, foldersResponse] = await Promise.all([
-            api("getFiles"),
-            api("getFolders")
+            apiGet("getFiles"),
+            apiGet("getFolders")
         ]);
 
         if (!filesResponse.success) {
@@ -1806,14 +1843,10 @@ async function createFolder() {
         closeModal();
         toast("Creating folder...");
 
-        const response = await api("createFolder", {
+        const response = await apiPost("createFolder", {
             name,
             parent_id: "1qiQodooK5aNdDfzBASq2eFQVaCshtPlz"
         });
-
-        if (!response.success) {
-            throw new Error(response.message || "Failed to create folder.");
-        }
 
         toast("Folder created.");
 
@@ -1948,17 +1981,13 @@ async function uploadFileToDrive() {
             ? file.name.split(".").pop().toUpperCase()
             : "FILE";
 
-        const response = await api("uploadFile", {
+        const response = await apiPost("uploadFile", {
             name: file.name,
             type: extension,
             folder_id: folderId,
             mime_type: file.type || "application/octet-stream",
             file_base64: base64
         });
-
-        if (!response.success) {
-            throw new Error(response.message || "Upload failed.");
-        }
 
         selectedUploadFile = null;
 
@@ -2105,14 +2134,10 @@ async function saveRename() {
         closeModal();
         toast("Renaming...");
 
-        const response = await api("renameFile", {
+        const response = await apiPost("renameFile", {
             drive_id: file.drive_id,
             name
         });
-
-        if (!response.success) {
-            throw new Error(response.message || "Rename failed.");
-        }
 
         toast("File renamed.");
 
@@ -2175,14 +2200,10 @@ async function saveNote() {
         closeModal();
         toast("Saving note...");
 
-        const response = await api("updateNote", {
+        const response = await apiPost("updateNote", {
             drive_id: file.drive_id,
             note: input.value.trim()
         });
-
-        if (!response.success) {
-            throw new Error(response.message || "Failed to save note.");
-        }
 
         toast("Note saved.");
 
@@ -2201,21 +2222,11 @@ async function toggleSelectedFavorite() {
     hideContextMenu();
 
     try {
-        const response = await api("toggleFavorite", {
+        const response = await apiPost("toggleFavorite", {
             drive_id: file.drive_id
         });
 
-        if (!response.success) {
-            throw new Error(
-                response.message || "Failed to update favorite."
-            );
-        }
-
-        toast(
-            response.favorite
-            ? "Added to favorites."
-            : "Removed from favorites."
-        );
+        toast("Favorite updated.");
 
         await loadData();
 
@@ -2418,13 +2429,9 @@ async function confirmTrash() {
         closeModal();
         toast("Moving to trash...");
 
-        const response = await api("moveToTrash", {
+        const response = await apiPost("moveToTrash", {
             drive_id: file.drive_id
         });
-
-        if (!response.success) {
-            throw new Error(response.message || "Failed to move file.");
-        }
 
         toast("File moved to trash.");
 
@@ -2445,13 +2452,9 @@ async function restoreItem(id) {
     try {
         toast("Restoring...");
 
-        const response = await api("restoreFile", {
+        const response = await apiPost("restoreFile", {
             drive_id: file.drive_id
         });
-
-        if (!response.success) {
-            throw new Error(response.message || "Restore failed.");
-        }
 
         toast("File restored.");
 
